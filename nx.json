@@ -16,11 +16,9 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/js/typescript",
+      "plugin": "@nx/js/w",
       "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
+        "typecheck": { "targetName": "typecheck" },
         "build": {
           "targetName": "build",
           "configName": "tsconfig.lib.json",
@@ -54,7 +52,7 @@
       "exclude": ["apps/fs-api-e2e/**/*"]
     }
   ],
-  "nxCloudId": "6a11c3b351ae22dbca8dd785",
+  "nxCloudId": "6a11c5229a3552ca27f5e0f3",
   "analytics": false,
   "targetDefaults": {
     "@angular/build:application": {
