@@ -16,7 +16,7 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/js/w",
+      "plugin": "@nx/js",
       "options": {
         "typecheck": { "targetName": "typecheck" },
         "build": {
