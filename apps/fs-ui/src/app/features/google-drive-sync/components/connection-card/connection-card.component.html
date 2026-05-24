@@ -1,0 +1,21 @@
+<section class="connection-card">
+  <div class="connection-card__content">
+    <h2 class="connection-card__title">Google Drive connection</h2>
+    <p class="connection-card__text">
+      Uses Google Drive changes API and webhook notifications.
+    </p>
+  </div>
+
+  <button
+    class="connection-card__button"
+    type="button"
+    [disabled]="connecting()"
+    (click)="connect.emit()"
+  >
+    @if (connecting()) {
+      Connecting...
+    } @else {
+      Connect Google Drive
+    }
+  </button>
+</section>

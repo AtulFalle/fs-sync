@@ -1,0 +1,45 @@
+.sync-status-pill {
+  align-items: center;
+  border: 1px solid var(--fs-border, #d9e1ec);
+  border-radius: 999px;
+  color: var(--fs-muted, #5f6f85);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.34rem 0.62rem;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.sync-status-pill--active,
+.sync-status-pill--stored {
+  background: #eefaf3;
+  border-color: #bfe8cd;
+  color: var(--fs-success, #167a3d);
+}
+
+.sync-status-pill--queued {
+  background: #eef4ff;
+  border-color: #c8dafb;
+  color: var(--fs-primary, #285fd3);
+}
+
+.sync-status-pill--expired,
+.sync-status-pill--disabled,
+.sync-status-pill--deleted {
+  background: #f5f7fa;
+  border-color: var(--fs-border, #d9e1ec);
+  color: var(--fs-muted, #5f6f85);
+}
+
+.sync-status-pill--error,
+.sync-status-pill--failed {
+  background: #fff1f1;
+  border-color: #f3c4c4;
+  color: var(--fs-danger, #b42318);
+}
+
+.sync-status-pill--default {
+  background: #ffffff;
+}

@@ -1,0 +1,66 @@
+services:
+  api:
+    build:
+      target: dev
+    command: >
+      sh -c "pnpm prisma generate &&
+      pnpm nx reset &&
+      pnpm nx serve api --configuration=development"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: true
+      NX_DAEMON: false
+      WATCHPACK_POLLING: true
+    volumes:
+      - .:/app
+      - api-node-modules:/app/node_modules
+      - api-nx-cache:/app/.nx
+      - api-dist:/app/dist
+
+  worker:
+    build:
+      target: dev
+    command: >
+      sh -c "pnpm prisma generate &&
+      pnpm nx reset &&
+      pnpm nx serve worker --configuration=development"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: true
+      NX_DAEMON: false
+      WATCHPACK_POLLING: true
+    volumes:
+      - .:/app
+      - worker-node-modules:/app/node_modules
+      - worker-nx-cache:/app/.nx
+      - worker-dist:/app/dist
+
+  ui:
+    build:
+      target: dev
+      args:
+        APP: fs-ui
+    command: >
+      sh -c "pnpm nx reset &&
+      pnpm nx serve fs-ui --configuration=development --host=0.0.0.0 --port=4200 --poll=1000 --watch --proxy-config=apps/fs-ui/proxy.conf.json"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: true
+      NX_DAEMON: false
+      WATCHPACK_POLLING: true
+    volumes:
+      - .:/app
+      - ui-node-modules:/app/node_modules
+      - ui-nx-cache:/app/.nx
+      - ui-dist:/app/dist
+
+volumes:
+  api-node-modules:
+  api-nx-cache:
+  api-dist:
+  worker-node-modules:
+  worker-nx-cache:
+  worker-dist:
+  ui-node-modules:
+  ui-nx-cache:
+  ui-dist:

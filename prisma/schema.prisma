@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Provider {
+  google_drive
+}
+
+enum ProviderConnectionStatus {
+  active
+  disconnected
+  error
+}
+
+enum WatchSourceType {
+  user_drive
+  shared_drive
+}
+
+enum WatchSourceStatus {
+  active
+  expired
+  stopped
+  error
+}
+
+enum DownloadStatus {
+  not_requested
+  queued
+  stored
+  failed
+  skipped
+}
+
+enum DownloadJobStatus {
+  queued
+  running
+  stored
+  failed
+}
+
+model Organization {
+  id                  String               @id @default(uuid())
+  name                String
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  providerConnections ProviderConnection[]
+  syncScopes          SyncScope[]
+  fileMetadata        FileMetadata[]
+}
+
+model ProviderConnection {
+  id                    String                   @id @default(uuid())
+  orgId                 String
+  provider              Provider                 @default(google_drive)
+  name                  String
+  credentialsRef        String?
+  accessTokenEncrypted  String
+  refreshTokenEncrypted String?
+  tokenExpiresAt        DateTime?
+  status                ProviderConnectionStatus @default(active)
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  organization          Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  watchSources          WatchSource[]
+
+  @@index([orgId])
+}
+
+model WatchSource {
+  id               String            @id @default(uuid())
+  connectionId     String
+  provider         Provider          @default(google_drive)
+  sourceType       WatchSourceType   @default(user_drive)
+  externalSourceId String
+  driveId          String?
+  rootFolderId     String?
+  pageToken        String
+  channelId        String?
+  resourceId       String?
+  channelToken     String?
+  expiresAt        DateTime?
+  status           WatchSourceStatus @default(active)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  connection       ProviderConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  syncScopes       SyncScope[]
+  fileMetadata     FileMetadata[]
+  rawEvents        RawProviderEvent[]
+
+  @@unique([provider, channelId])
+  @@unique([provider, resourceId])
+  @@index([channelId])
+  @@index([resourceId])
+  @@index([expiresAt])
+}
+
+model SyncScope {
+  id               String       @id @default(uuid())
+  orgId            String
+  userId           String?
+  watchSourceId    String
+  folderIdOrPrefix String
+  includeSubfolders Boolean     @default(true)
+  enabled          Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  organization     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  watchSource      WatchSource  @relation(fields: [watchSourceId], references: [id], onDelete: Cascade)
+
+  @@index([watchSourceId, enabled])
+}
+
+model FileMetadata {
+  id               String         @id @default(uuid())
+  orgId            String
+  watchSourceId    String
+  provider         Provider       @default(google_drive)
+  providerFileId   String
+  name             String
+  path             String?
+  parentProviderId String?
+  mimeType         String
+  sizeBytes        BigInt?
+  md5Checksum      String?
+  version          String?
+  webViewLink      String?
+  isFolder         Boolean        @default(false)
+  deletedAt        DateTime?
+  trashed          Boolean        @default(false)
+  modifiedAt       DateTime?
+  lastSyncedAt     DateTime       @default(now())
+  downloadStatus   DownloadStatus @default(not_requested)
+  objectStorageKey String?
+  providerRaw      Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  organization     Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  watchSource      WatchSource    @relation(fields: [watchSourceId], references: [id], onDelete: Cascade)
+  downloadJobs     DownloadJob[]
+
+  @@unique([watchSourceId, providerFileId])
+  @@index([orgId, watchSourceId])
+  @@index([watchSourceId, providerFileId])
+  @@index([watchSourceId, parentProviderId])
+  @@index([watchSourceId, deletedAt])
+  @@index([mimeType])
+}
+
+model RawProviderEvent {
+  id            String       @id @default(uuid())
+  watchSourceId String?
+  provider      Provider     @default(google_drive)
+  eventType     String
+  eventId       String?
+  headers       Json
+  rawPayload    Json?
+  receivedAt    DateTime     @default(now())
+  processedAt   DateTime?
+  watchSource   WatchSource? @relation(fields: [watchSourceId], references: [id], onDelete: SetNull)
+
+  @@index([watchSourceId])
+  @@index([receivedAt])
+}
+
+model DownloadJob {
+  id             String            @id @default(uuid())
+  fileMetadataId String
+  provider       Provider          @default(google_drive)
+  providerFileId String
+  status         DownloadJobStatus @default(queued)
+  retryCount     Int               @default(0)
+  error          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  fileMetadata   FileMetadata      @relation(fields: [fileMetadataId], references: [id], onDelete: Cascade)
+
+  @@index([fileMetadataId])
+  @@index([status])
+}

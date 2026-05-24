@@ -1,0 +1,87 @@
+.google-drive-sync {
+  --fs-border: #d9e1ec;
+  --fs-danger: #b42318;
+  --fs-muted: #5f6f85;
+  --fs-primary: #285fd3;
+  --fs-success: #167a3d;
+  --fs-surface: #ffffff;
+
+  background: #f7f9fc;
+  color: #1e293b;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.google-drive-sync__header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto 1.25rem;
+  max-width: 1180px;
+}
+
+.google-drive-sync__title {
+  font-size: 1.85rem;
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.google-drive-sync__subtitle {
+  color: var(--fs-muted);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin: 0.45rem 0 0;
+}
+
+.google-drive-sync__alert {
+  background: #fff1f1;
+  border: 1px solid #f3c4c4;
+  border-radius: 8px;
+  color: var(--fs-danger);
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0 auto 1rem;
+  max-width: 1180px;
+  padding: 0.8rem 1rem;
+}
+
+.google-drive-sync__layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  margin: 1rem auto 0;
+  max-width: 1180px;
+}
+
+.google-drive-sync__section {
+  min-width: 0;
+}
+
+.google-drive-sync__section--connection {
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.google-drive-sync__section--files {
+  min-width: 0;
+}
+
+.google-drive-sync__loading {
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-border);
+  border-radius: 8px;
+  color: var(--fs-muted);
+  font-size: 0.92rem;
+  padding: 1rem;
+}
+
+@media (max-width: 860px) {
+  .google-drive-sync {
+    padding: 1rem;
+  }
+
+  .google-drive-sync__layout {
+    grid-template-columns: 1fr;
+  }
+}
