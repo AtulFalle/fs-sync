@@ -123,6 +123,12 @@ importers:
       '@typescript-eslint/utils':
         specifier: ^8.40.0
         version: 8.59.4(eslint@9.39.4)(typescript@5.9.3)
+      amqp-connection-manager:
+        specifier: ^5.0.0
+        version: 5.0.0(amqplib@2.0.1)
+      amqplib:
+        specifier: ^2.0.1
+        version: 2.0.1
       angular-eslint:
         specifier: ^21.2.0
         version: 21.4.0(@angular/cli@21.2.12)(eslint@9.39.4)(typescript-eslint@8.59.4)(typescript@5.9.3)
@@ -7346,6 +7352,21 @@ packages:
       '@algolia/requester-node-http': 5.48.1
     dev: true
 
+  /amqp-connection-manager@5.0.0(amqplib@2.0.1):
+    resolution: {integrity: sha512-88yQzqa5RSBgnLl504XjvCQJ7d+osskdwvg35Lwm1LRbfLjNU9p7SQUMSP82BB7mseiq9tIUPJ3HE3eXQbpjEw==}
+    engines: {node: '>=10.0.0', npm: '>5.0.0'}
+    peerDependencies:
+      amqplib: '*'
+    dependencies:
+      amqplib: 2.0.1
+      promise-breaker: 6.0.0
+    dev: true
+
+  /amqplib@2.0.1:
+    resolution: {integrity: sha512-a3P2MgfCf9nzVis12VxWEn0dS6hcqve7dlEAhXDtIWR27BlhtMkILOc+H9aeHjDi6i6r94dYKc2Kx2OFe3avvg==}
+    engines: {node: '>=18'}
+    dev: true
+
   /angular-eslint@21.4.0(@angular/cli@21.2.12)(eslint@9.39.4)(typescript-eslint@8.59.4)(typescript@5.9.3):
     resolution: {integrity: sha512-LH7bWmtJvsubzwPoztnl1pWgI5X0VrfGTUITGSYcwn2J+SXuN/avzrKrxJmhUiIrNvLtfV+18GG6xZS1IGZdKg==}
     peerDependencies:
@@ -13232,6 +13253,10 @@ packages:
 
   /process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
+    dev: true
+
+  /promise-breaker@6.0.0:
+    resolution: {integrity: sha512-BthzO9yTPswGf7etOBiHCVuugs2N01/Q/94dIPls48z2zCmrnDptUUZzfIb+41xq0MnYZ/BzmOd6ikDR4ibNZA==}
     dev: true
 
   /promise-retry@2.0.1:
