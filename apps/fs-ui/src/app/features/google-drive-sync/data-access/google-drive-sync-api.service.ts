@@ -45,7 +45,10 @@ export class GoogleDriveSyncApiService {
 
   downloadFile(fileId: string): Promise<void> {
     return firstValueFrom(
-      this.http.post<void>(`${this.apiBaseUrl}/api/files/${fileId}/download`, {}),
+      this.http.post<void>(
+        `${this.apiBaseUrl}/api/files/${fileId}/download`,
+        {},
+      ),
     );
   }
 }

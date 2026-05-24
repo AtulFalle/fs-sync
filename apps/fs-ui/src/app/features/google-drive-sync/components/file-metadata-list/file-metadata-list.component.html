@@ -4,7 +4,9 @@
   </div>
 
   @if (!selectedWatchSourceId()) {
-    <p class="file-metadata-list__empty">Select a watch source to view files.</p>
+    <p class="file-metadata-list__empty">
+      Select a watch source to view files.
+    </p>
   } @else if (loading()) {
     <p class="file-metadata-list__empty">Loading files...</p>
   } @else if (files().length === 0) {

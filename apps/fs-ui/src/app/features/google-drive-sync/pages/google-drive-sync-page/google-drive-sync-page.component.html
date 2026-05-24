@@ -12,7 +12,9 @@
     <div class="google-drive-sync__alert" role="alert">{{ error() }}</div>
   }
 
-  <section class="google-drive-sync__section google-drive-sync__section--connection">
+  <section
+    class="google-drive-sync__section google-drive-sync__section--connection"
+  >
     <app-connection-card
       [connecting]="connecting()"
       (connect)="connectGoogleDrive()"
