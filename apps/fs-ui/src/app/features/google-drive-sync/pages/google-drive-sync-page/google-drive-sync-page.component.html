@@ -1,0 +1,49 @@
+<main class="google-drive-sync">
+  <header class="google-drive-sync__header">
+    <div>
+      <h1 class="google-drive-sync__title">Google Drive Sync</h1>
+      <p class="google-drive-sync__subtitle">
+        Connect Google Drive, watch changes, sync metadata, and download files.
+      </p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="google-drive-sync__alert" role="alert">{{ error() }}</div>
+  }
+
+  <section
+    class="google-drive-sync__section google-drive-sync__section--connection"
+  >
+    <app-connection-card
+      [connecting]="connecting()"
+      (connect)="connectGoogleDrive()"
+    />
+  </section>
+
+  <section class="google-drive-sync__layout">
+    <div class="google-drive-sync__section">
+      @if (loadingSources()) {
+        <div class="google-drive-sync__loading">Loading watch sources...</div>
+      } @else {
+        <app-watch-source-list
+          [sources]="watchSources()"
+          [selectedWatchSourceId]="selectedWatchSourceId()"
+          [syncingId]="syncingId()"
+          (selectSource)="selectWatchSource($event)"
+          (syncNow)="syncNow($event)"
+        />
+      }
+    </div>
+
+    <div class="google-drive-sync__section google-drive-sync__section--files">
+      <app-file-metadata-list
+        [files]="files()"
+        [loading]="loadingFiles()"
+        [selectedWatchSourceId]="selectedWatchSourceId()"
+        [downloadingId]="downloadingId()"
+        (downloadFile)="downloadFile($event)"
+      />
+    </div>
+  </section>
+</main>

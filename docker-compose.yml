@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fs_sync
+      POSTGRES_PASSWORD: fs_sync
+      POSTGRES_DB: fs_sync
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+  api:
+    build:
+      context: .
+      args:
+        APP: api
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://fs_sync:fs_sync@postgres:5432/fs_sync?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      GOOGLE_DRIVE_WEBHOOK_URL: ${GOOGLE_DRIVE_WEBHOOK_URL}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY}
+      PORT: 3000
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - '3000:3000'
+
+  worker:
+    build:
+      context: .
+      args:
+        APP: worker
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://fs_sync:fs_sync@postgres:5432/fs_sync?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      GOOGLE_DRIVE_WEBHOOK_URL: ${GOOGLE_DRIVE_WEBHOOK_URL}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY}
+      WORKER_HEALTH_PORT: 3001
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - '3001:3001'
+
+  ui:
+    build:
+      context: .
+      target: ui-runtime
+      args:
+        APP: fs-ui
+    depends_on:
+      - api
+    ports:
+      - '4200:4200'
+
+volumes:
+  postgres-data:

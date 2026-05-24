@@ -2,8 +2,21 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "nx": "nx",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "api:dev": "nx serve api",
+    "worker:dev": "nx serve worker",
+    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d",
+    "docker:dev:up": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f api worker ui"
+  },
   "private": true,
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "devDependencies": {
     "@angular-devkit/core": "~21.2.0",
     "@angular-devkit/schematics": "~21.2.0",
@@ -58,10 +71,20 @@
     "@angular/platform-browser": "~21.2.0",
     "@angular/router": "~21.2.0",
     "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/schedule": "^6.0.1",
+    "@nestjs/swagger": "^11.2.3",
+    "@prisma/client": "^6.19.0",
     "axios": "^1.6.0",
+    "bullmq": "^5.64.1",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^166.0.0",
+    "ioredis": "^5.8.2",
+    "prisma": "^6.19.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "~7.8.0"
+    "rxjs": "~7.8.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

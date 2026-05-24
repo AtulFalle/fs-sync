@@ -1,0 +1,53 @@
+<section class="watch-source-list">
+  <div class="watch-source-list__header">
+    <h2 class="watch-source-list__title">Watch sources</h2>
+  </div>
+
+  @if (sources().length === 0) {
+    <p class="watch-source-list__empty">No Google Drive watch sources yet.</p>
+  } @else {
+    <div class="watch-source-list__items">
+      @for (source of sources(); track source.id) {
+        <article
+          class="watch-source-list__item"
+          [class.watch-source-list__item--selected]="
+            source.id === selectedWatchSourceId()
+          "
+        >
+          <div class="watch-source-list__details">
+            <div class="watch-source-list__name">
+              {{ sourceTypeLabel(source.sourceType) }}
+            </div>
+            <div class="watch-source-list__meta">
+              Expires {{ formatDate(source.expiresAt) }}
+            </div>
+          </div>
+
+          <app-sync-status-pill [status]="source.status" />
+
+          <div class="watch-source-list__actions">
+            <button
+              class="watch-source-list__button"
+              type="button"
+              (click)="selectSource.emit(source.id)"
+            >
+              Select
+            </button>
+            <button
+              class="watch-source-list__button watch-source-list__button--primary"
+              type="button"
+              [disabled]="syncingId() === source.id"
+              (click)="syncNow.emit(source.id)"
+            >
+              @if (syncingId() === source.id) {
+                Syncing...
+              } @else {
+                Sync Now
+              }
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

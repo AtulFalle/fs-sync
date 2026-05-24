@@ -1,0 +1,79 @@
+<section class="file-metadata-list">
+  <div class="file-metadata-list__header">
+    <h2 class="file-metadata-list__title">File metadata</h2>
+  </div>
+
+  @if (!selectedWatchSourceId()) {
+    <p class="file-metadata-list__empty">
+      Select a watch source to view files.
+    </p>
+  } @else if (loading()) {
+    <p class="file-metadata-list__empty">Loading files...</p>
+  } @else if (files().length === 0) {
+    <p class="file-metadata-list__empty">No files synced yet.</p>
+  } @else {
+    <div class="file-metadata-list__table-wrap">
+      <table class="file-metadata-list__table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Size</th>
+            <th>Modified</th>
+            <th>Download Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (file of files(); track file.id) {
+            <tr>
+              <td>
+                <div class="file-metadata-list__name">{{ file.name }}</div>
+                @if (file.path) {
+                  <div class="file-metadata-list__path">{{ file.path }}</div>
+                }
+              </td>
+              <td>{{ displayType(file) }}</td>
+              <td>{{ formatSize(file.sizeBytes) }}</td>
+              <td>{{ formatDate(file.modifiedAt) }}</td>
+              <td>
+                <app-sync-status-pill [status]="file.downloadStatus" />
+              </td>
+              <td>
+                <div class="file-metadata-list__actions">
+                  @if (file.webViewLink) {
+                    <a
+                      class="file-metadata-list__action"
+                      [href]="file.webViewLink"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open
+                    </a>
+                  }
+
+                  @if (file.deletedAt) {
+                    <span class="file-metadata-list__deleted">Deleted</span>
+                  } @else if (!file.isFolder) {
+                    <button
+                      class="file-metadata-list__action"
+                      type="button"
+                      [disabled]="downloadingId() === file.id"
+                      (click)="downloadFile.emit(file.id)"
+                    >
+                      @if (downloadingId() === file.id) {
+                        Downloading...
+                      } @else {
+                        Download
+                      }
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

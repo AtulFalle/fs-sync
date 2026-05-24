@@ -14,6 +14,14 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@org/source"]
+    "customConditions": ["@org/source"],
+    "paths": {
+      "@org/common": ["./libs/common/src/index.ts"],
+      "@org/database": ["./libs/database/src/index.ts"],
+      "@org/google-drive": ["./libs/providers/google-drive/src/index.ts"],
+      "@org/metadata": ["./libs/metadata/src/index.ts"],
+      "@org/queue": ["./libs/queue/src/index.ts"],
+      "@org/storage": ["./libs/storage/src/index.ts"]
+    }
   }
 }
