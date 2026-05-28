@@ -127,17 +127,21 @@ export class GoogleDriveOAuthController {
       },
     });
 
-    await this.importInitialMetadata(verifiedState.orgId, connection.id, watchSource.id);
+    await this.importInitialMetadata(
+      verifiedState.orgId,
+      connection.id,
+      watchSource.id,
+    );
 
     const updatedWatchSource = await this.registerWatchIfEnabled(
       connection.id,
       watchSource.id,
     );
 
-    const appOrigin = optionalEnv('APP_ORIGIN', 'http://localhost:4200').replace(
-      /\/$/,
-      '',
-    );
+    const appOrigin = optionalEnv(
+      'APP_ORIGIN',
+      'http://localhost:4200',
+    ).replace(/\/$/, '');
 
     return response.redirect(
       302,
@@ -151,10 +155,15 @@ export class GoogleDriveOAuthController {
     watchSourceId: string,
   ): Promise<void> {
     let pageToken: string | undefined;
-    const maxPages = Number(optionalEnv('GOOGLE_DRIVE_INITIAL_FILES_MAX_PAGES', '5'));
+    const maxPages = Number(
+      optionalEnv('GOOGLE_DRIVE_INITIAL_FILES_MAX_PAGES', '5'),
+    );
 
     for (let page = 0; page < maxPages; page += 1) {
-      const response = await this.googleDrive.listFiles(connectionId, pageToken);
+      const response = await this.googleDrive.listFiles(
+        connectionId,
+        pageToken,
+      );
 
       for (const file of response.files ?? []) {
         const normalized = this.googleDrive.normalizeFile(file);
@@ -173,14 +182,20 @@ export class GoogleDriveOAuthController {
     }
   }
 
-  private async registerWatchIfEnabled(connectionId: string, watchSourceId: string) {
+  private async registerWatchIfEnabled(
+    connectionId: string,
+    watchSourceId: string,
+  ) {
     if (optionalEnv('GOOGLE_DRIVE_ENABLE_WEBHOOKS', 'false') !== 'true') {
       return this.prisma.watchSource.findUniqueOrThrow({
         where: { id: watchSourceId },
       });
     }
 
-    const channel = await this.googleDrive.watchChanges(connectionId, watchSourceId);
+    const channel = await this.googleDrive.watchChanges(
+      connectionId,
+      watchSourceId,
+    );
     return this.prisma.watchSource.update({
       where: { id: watchSourceId },
       data: {

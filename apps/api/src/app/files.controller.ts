@@ -57,7 +57,9 @@ export class FilesController {
     });
 
     if (!watchSource) {
-      throw new NotFoundException(`Watch source ${watchSourceId} does not exist`);
+      throw new NotFoundException(
+        `Watch source ${watchSourceId} does not exist`,
+      );
     }
 
     return this.prisma.fileMetadata.findMany({

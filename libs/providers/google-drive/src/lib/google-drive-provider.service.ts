@@ -163,7 +163,9 @@ export class GoogleDriveProviderService {
     const response = await drive.files.list({
       corpora: 'user',
       includeItemsFromAllDrives: true,
-      pageSize: Number(optionalEnv('GOOGLE_DRIVE_INITIAL_FILES_PAGE_SIZE', '100')),
+      pageSize: Number(
+        optionalEnv('GOOGLE_DRIVE_INITIAL_FILES_PAGE_SIZE', '100'),
+      ),
       pageToken,
       q: 'trashed = false',
       supportsAllDrives: true,

@@ -79,13 +79,20 @@ export class GoogleDriveSyncPageComponent implements OnInit {
     await Promise.all([this.loadFiles(watchSourceId), this.loadDriveFolder()]);
   }
 
-  protected async openDriveFolder(folder: GoogleDriveBrowserItem): Promise<void> {
-    this.drivePath.update((path) => [...path, { id: folder.id, name: folder.name }]);
+  protected async openDriveFolder(
+    folder: GoogleDriveBrowserItem,
+  ): Promise<void> {
+    this.drivePath.update((path) => [
+      ...path,
+      { id: folder.id, name: folder.name },
+    ]);
     await this.loadDriveFolder(folder.id);
   }
 
   protected async goToDriveFolder(folderId: string): Promise<void> {
-    const index = this.drivePath().findIndex((folder) => folder.id === folderId);
+    const index = this.drivePath().findIndex(
+      (folder) => folder.id === folderId,
+    );
 
     if (index >= 0) {
       this.drivePath.set(this.drivePath().slice(0, index + 1));
@@ -94,7 +101,9 @@ export class GoogleDriveSyncPageComponent implements OnInit {
     await this.loadDriveFolder(folderId);
   }
 
-  protected async selectDriveFolder(folder: GoogleDriveBrowserItem): Promise<void> {
+  protected async selectDriveFolder(
+    folder: GoogleDriveBrowserItem,
+  ): Promise<void> {
     const watchSourceId = this.selectedWatchSourceId();
 
     if (!watchSourceId) {
@@ -257,7 +266,9 @@ export class GoogleDriveSyncPageComponent implements OnInit {
     }
   }
 
-  private async loadDriveFolder(parentId = this.drivePath().at(-1)?.id): Promise<void> {
+  private async loadDriveFolder(
+    parentId = this.drivePath().at(-1)?.id,
+  ): Promise<void> {
     const orgId = this.orgId();
 
     if (!orgId || !this.selectedWatchSourceId()) {

@@ -110,7 +110,10 @@ export class GoogleDriveBrowserItemDto {
   @ApiProperty({ example: true })
   isFolder!: boolean;
 
-  @ApiPropertyOptional({ nullable: true, example: 'https://drive.google.com/...' })
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'https://drive.google.com/...',
+  })
   webViewLink?: string | null;
 
   @ApiPropertyOptional({ nullable: true, format: 'date-time' })

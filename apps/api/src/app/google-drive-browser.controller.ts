@@ -22,7 +22,10 @@ import { PrismaService } from '@org/database';
 import { GoogleDriveProviderService } from '@org/google-drive';
 import { Provider } from '@prisma/client';
 import { SelectSyncScopeDto } from './dto/api-requests.dto';
-import { GoogleDriveBrowserResponseDto, WatchSourceDto } from './dto/api-responses.dto';
+import {
+  GoogleDriveBrowserResponseDto,
+  WatchSourceDto,
+} from './dto/api-responses.dto';
 
 @ApiTags('Google Drive Browser')
 @Controller('google-drive/browser')
@@ -52,7 +55,10 @@ export class GoogleDriveBrowserController {
   @ApiNotFoundResponse({
     description: 'No active Google Drive connection exists for the org.',
   })
-  async list(@Query('orgId') orgId: string, @Query('parentId') parentId?: string) {
+  async list(
+    @Query('orgId') orgId: string,
+    @Query('parentId') parentId?: string,
+  ) {
     if (!orgId) {
       throw new BadRequestException('Missing orgId');
     }
@@ -127,7 +133,9 @@ export class GoogleDriveBrowserController {
     });
 
     if (!watchSource) {
-      throw new NotFoundException(`Watch source ${watchSourceId} does not exist`);
+      throw new NotFoundException(
+        `Watch source ${watchSourceId} does not exist`,
+      );
     }
 
     await this.prisma.syncScope.deleteMany({
