@@ -1,4 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Query,
+  Res,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
@@ -10,14 +16,20 @@ import { Provider } from '@prisma/client';
 import {
   createSignedState,
   encryptSecret,
+  optionalEnv,
   verifySignedState,
 } from '@org/common';
 import { PrismaService } from '@org/database';
 import { GoogleDriveProviderService } from '@org/google-drive';
+import { MetadataService } from '@org/metadata';
 import {
   GoogleDriveOAuthCallbackResponseDto,
   OAuthUrlResponseDto,
 } from './dto/api-responses.dto';
+
+type RedirectResponse = {
+  redirect(status: number, url: string): unknown;
+};
 
 @ApiTags('Google Drive OAuth')
 @Controller('google-drive/oauth')
@@ -25,6 +37,7 @@ export class GoogleDriveOAuthController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly googleDrive: GoogleDriveProviderService,
+    private readonly metadata: MetadataService,
   ) {}
 
   @Get('url')
@@ -42,7 +55,8 @@ export class GoogleDriveOAuthController {
   @ApiBadRequestResponse({
     description: 'Missing env vars or invalid orgId/state input.',
   })
-  getOAuthUrl(@Query('orgId') orgId: string) {
+  async getOAuthUrl(@Query('orgId') orgId: string) {
+    await this.assertOrganizationExists(orgId);
     const state = createSignedState(orgId);
     return { url: this.googleDrive.createOAuthUrl(state), state };
   }
@@ -66,8 +80,20 @@ export class GoogleDriveOAuthController {
     description:
       'Invalid/expired state, missing code, or Google token exchange failure.',
   })
-  async callback(@Query('code') code: string, @Query('state') state: string) {
+  async callback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() response: RedirectResponse,
+  ) {
+    if (!code) {
+      throw new BadRequestException('Missing Google OAuth code');
+    }
+    if (!state) {
+      throw new BadRequestException('Missing Google OAuth state');
+    }
+
     const verifiedState = verifySignedState(state);
+    await this.assertOrganizationExists(verifiedState.orgId);
     const tokens = await this.googleDrive.exchangeCodeForTokens(code);
 
     if (!tokens.access_token) {
@@ -101,12 +127,77 @@ export class GoogleDriveOAuthController {
       },
     });
 
-    const channel = await this.googleDrive.watchChanges(
+    await this.importInitialMetadata(
+      verifiedState.orgId,
       connection.id,
       watchSource.id,
     );
-    const updatedWatchSource = await this.prisma.watchSource.update({
-      where: { id: watchSource.id },
+
+    const updatedWatchSource = await this.registerWatchIfEnabled(
+      connection.id,
+      watchSource.id,
+    );
+
+    const appOrigin = optionalEnv(
+      'APP_ORIGIN',
+      'http://localhost:4200',
+    ).replace(/\/$/, '');
+
+    return response.redirect(
+      302,
+      `${appOrigin}/google-drive-sync?connected=google-drive&orgId=${verifiedState.orgId}&watchSourceId=${updatedWatchSource.id}`,
+    );
+  }
+
+  private async importInitialMetadata(
+    orgId: string,
+    connectionId: string,
+    watchSourceId: string,
+  ): Promise<void> {
+    let pageToken: string | undefined;
+    const maxPages = Number(
+      optionalEnv('GOOGLE_DRIVE_INITIAL_FILES_MAX_PAGES', '5'),
+    );
+
+    for (let page = 0; page < maxPages; page += 1) {
+      const response = await this.googleDrive.listFiles(
+        connectionId,
+        pageToken,
+      );
+
+      for (const file of response.files ?? []) {
+        const normalized = this.googleDrive.normalizeFile(file);
+        await this.metadata.upsertGoogleDriveFile({
+          orgId,
+          watchSourceId,
+          file: normalized,
+        });
+      }
+
+      if (!response.nextPageToken) {
+        return;
+      }
+
+      pageToken = response.nextPageToken;
+    }
+  }
+
+  private async registerWatchIfEnabled(
+    connectionId: string,
+    watchSourceId: string,
+  ) {
+    if (optionalEnv('GOOGLE_DRIVE_ENABLE_WEBHOOKS', 'false') !== 'true') {
+      return this.prisma.watchSource.findUniqueOrThrow({
+        where: { id: watchSourceId },
+      });
+    }
+
+    const channel = await this.googleDrive.watchChanges(
+      connectionId,
+      watchSourceId,
+    );
+    return this.prisma.watchSource.update({
+      where: { id: watchSourceId },
       data: {
         channelId: channel.channelId,
         resourceId: channel.resourceId,
@@ -114,11 +205,22 @@ export class GoogleDriveOAuthController {
         expiresAt: channel.expiresAt,
       },
     });
+  }
 
-    return {
-      connectionId: connection.id,
-      watchSourceId: updatedWatchSource.id,
-      expiresAt: updatedWatchSource.expiresAt,
-    };
+  private async assertOrganizationExists(orgId: string): Promise<void> {
+    if (!orgId) {
+      throw new BadRequestException('Missing orgId');
+    }
+
+    const organization = await this.prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { id: true },
+    });
+
+    if (!organization) {
+      throw new BadRequestException(
+        `Organization ${orgId} does not exist. Create an organization before connecting Google Drive.`,
+      );
+    }
   }
 }

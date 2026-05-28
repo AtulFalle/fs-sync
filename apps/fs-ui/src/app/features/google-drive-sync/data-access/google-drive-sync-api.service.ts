@@ -2,12 +2,31 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { FileMetadata, WatchSource } from './google-drive-sync.models';
+import {
+  FileMetadata,
+  GoogleDriveBrowserResponse,
+  Organization,
+  WatchSource,
+} from './google-drive-sync.models';
 
 @Injectable({ providedIn: 'root' })
 export class GoogleDriveSyncApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = environment.apiBaseUrl.replace(/\/$/, '');
+
+  createOrganization(name: string): Promise<Organization> {
+    return firstValueFrom(
+      this.http.post<Organization>(`${this.apiBaseUrl}/api/organizations`, {
+        name,
+      }),
+    );
+  }
+
+  getOrganization(id: string): Promise<Organization> {
+    return firstValueFrom(
+      this.http.get<Organization>(`${this.apiBaseUrl}/api/organizations/${id}`),
+    );
+  }
 
   getOAuthUrl(orgId: string): Promise<{ url: string }> {
     return firstValueFrom(
@@ -23,6 +42,42 @@ export class GoogleDriveSyncApiService {
       this.http.get<WatchSource[]>(`${this.apiBaseUrl}/api/watch-sources`, {
         params: { provider: 'google_drive', orgId },
       }),
+    );
+  }
+
+  browseGoogleDrive(
+    orgId: string,
+    parentId?: string,
+  ): Promise<GoogleDriveBrowserResponse> {
+    const params: Record<string, string> = { orgId };
+
+    if (parentId) {
+      params['parentId'] = parentId;
+    }
+
+    return firstValueFrom(
+      this.http.get<GoogleDriveBrowserResponse>(
+        `${this.apiBaseUrl}/api/google-drive/browser`,
+        { params },
+      ),
+    );
+  }
+
+  selectGoogleDriveScope(params: {
+    watchSourceId: string;
+    folderId: string;
+    folderName: string;
+    includeSubfolders: boolean;
+  }): Promise<WatchSource> {
+    return firstValueFrom(
+      this.http.post<WatchSource>(
+        `${this.apiBaseUrl}/api/google-drive/browser/watch-sources/${params.watchSourceId}/scope`,
+        {
+          folderId: params.folderId,
+          folderName: params.folderName,
+          includeSubfolders: params.includeSubfolders,
+        },
+      ),
     );
   }
 

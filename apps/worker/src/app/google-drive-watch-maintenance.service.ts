@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { optionalEnv } from '@org/common';
 import { Provider } from '@prisma/client';
 import { PrismaService } from '@org/database';
 import { GoogleDriveProviderService } from '@org/google-drive';
@@ -17,6 +18,10 @@ export class GoogleDriveWatchMaintenanceService {
 
   @Cron('0 * * * *')
   async renewExpiringWatches(): Promise<void> {
+    if (optionalEnv('GOOGLE_DRIVE_ENABLE_WEBHOOKS', 'false') !== 'true') {
+      return;
+    }
+
     const threshold = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const watchSources = await this.prisma.watchSource.findMany({
       where: {

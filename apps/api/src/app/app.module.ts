@@ -5,6 +5,7 @@ import { GoogleDriveModule } from '@org/google-drive';
 import { MetadataModule } from '@org/metadata';
 import { QueueModule } from '@org/queue';
 import { FilesController } from './files.controller';
+import { GoogleDriveBrowserController } from './google-drive-browser.controller';
 import { GoogleDriveOAuthController } from './google-drive-oauth.controller';
 import { OrganizationsController } from './organizations.controller';
 import { WatchSourcesController } from './watch-sources.controller';
@@ -20,6 +21,7 @@ import { GoogleDriveWebhookController } from './webhooks/google-drive-webhook.co
   ],
   controllers: [
     OrganizationsController,
+    GoogleDriveBrowserController,
     GoogleDriveOAuthController,
     GoogleDriveWebhookController,
     WatchSourcesController,

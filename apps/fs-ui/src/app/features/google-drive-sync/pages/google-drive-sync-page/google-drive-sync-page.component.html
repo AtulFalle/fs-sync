@@ -37,6 +37,17 @@
     </div>
 
     <div class="google-drive-sync__section google-drive-sync__section--files">
+      <app-drive-browser
+        [items]="driveItems()"
+        [path]="drivePath()"
+        [loading]="loadingDriveItems()"
+        [selectedFolderId]="selectedRootFolderId()"
+        [savingFolderId]="savingFolderId()"
+        (openFolder)="openDriveFolder($event)"
+        (goToFolder)="goToDriveFolder($event)"
+        (selectFolder)="selectDriveFolder($event)"
+      />
+
       <app-file-metadata-list
         [files]="files()"
         [loading]="loadingFiles()"

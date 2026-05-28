@@ -1,3 +1,10 @@
+export interface Organization {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface WatchSource {
   id: string;
   connectionId: string;
@@ -13,6 +20,22 @@ export interface WatchSource {
   status: 'active' | 'expired' | 'error' | 'disabled';
   createdAt: string;
   updatedAt: string;
+}
+
+export interface GoogleDriveBrowserItem {
+  id: string;
+  name: string;
+  mimeType: string;
+  isFolder: boolean;
+  webViewLink?: string | null;
+  modifiedAt?: string | null;
+}
+
+export interface GoogleDriveBrowserResponse {
+  connectionId: string;
+  watchSourceId: string;
+  parentId?: string | null;
+  items: GoogleDriveBrowserItem[];
 }
 
 export interface FileMetadata {

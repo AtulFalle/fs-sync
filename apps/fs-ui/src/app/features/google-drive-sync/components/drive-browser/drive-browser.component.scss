@@ -1,0 +1,148 @@
+.drive-browser {
+  background: var(--fs-surface, #ffffff);
+  border: 1px solid var(--fs-border, #d9e1ec);
+  border-radius: 8px;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.drive-browser__header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.drive-browser__title {
+  color: #1e293b;
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.drive-browser__crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.drive-browser__crumb {
+  background: #ffffff;
+  border: 1px solid var(--fs-border, #d9e1ec);
+  border-radius: 6px;
+  color: var(--fs-primary, #285fd3);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.35rem 0.5rem;
+}
+
+.drive-browser__crumb:disabled {
+  color: var(--fs-muted, #5f6f85);
+  cursor: default;
+}
+
+.drive-browser__empty {
+  color: var(--fs-muted, #5f6f85);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.drive-browser__list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.drive-browser__row {
+  align-items: center;
+  border: 1px solid var(--fs-border, #d9e1ec);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0.72rem;
+}
+
+.drive-browser__row--selected {
+  border-color: var(--fs-success, #167a3d);
+  box-shadow: inset 3px 0 0 var(--fs-success, #167a3d);
+}
+
+.drive-browser__row--file {
+  background: #fbfcfe;
+}
+
+.drive-browser__main {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #1e293b;
+  cursor: pointer;
+  display: flex;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.drive-browser__main--static {
+  cursor: default;
+}
+
+.drive-browser__icon {
+  background: #eef4ff;
+  border: 1px solid #c8dafb;
+  border-radius: 6px;
+  color: var(--fs-primary, #285fd3);
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.38rem 0.42rem;
+  text-transform: uppercase;
+}
+
+.drive-browser__name {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drive-browser__meta {
+  color: var(--fs-muted, #5f6f85);
+  display: block;
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+}
+
+.drive-browser__select {
+  background: #ffffff;
+  border: 1px solid var(--fs-border, #d9e1ec);
+  border-radius: 6px;
+  color: #1e293b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.52rem 0.7rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.drive-browser__select:disabled {
+  cursor: not-allowed;
+  opacity: 0.66;
+}
+
+@media (max-width: 640px) {
+  .drive-browser__row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+}

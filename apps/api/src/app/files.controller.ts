@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBody,
   ApiNotFoundResponse,
@@ -37,7 +46,22 @@ export class FilesController {
     example: 'd2e50266-80db-44bf-aaf7-169d68fa2395',
   })
   @ApiOkResponse({ type: FileMetadataDto, isArray: true })
-  list(@Query('watchSourceId') watchSourceId: string) {
+  async list(@Query('watchSourceId') watchSourceId: string) {
+    if (!watchSourceId) {
+      throw new BadRequestException('Missing watchSourceId');
+    }
+
+    const watchSource = await this.prisma.watchSource.findUnique({
+      where: { id: watchSourceId },
+      select: { id: true },
+    });
+
+    if (!watchSource) {
+      throw new NotFoundException(
+        `Watch source ${watchSourceId} does not exist`,
+      );
+    }
+
     return this.prisma.fileMetadata.findMany({
       where: {
         watchSourceId,
@@ -63,8 +87,14 @@ export class FilesController {
   @ApiNotFoundResponse({
     description: 'No FileMetadata row exists for the given id.',
   })
-  get(@Param('id') id: string) {
-    return this.prisma.fileMetadata.findUniqueOrThrow({ where: { id } });
+  async get(@Param('id') id: string) {
+    const file = await this.prisma.fileMetadata.findUnique({ where: { id } });
+
+    if (!file) {
+      throw new NotFoundException(`File metadata ${id} does not exist`);
+    }
+
+    return file;
   }
 
   @Post(':id/download')
@@ -87,9 +117,14 @@ export class FilesController {
     @Param('id') id: string,
     @Body() body: RequestFileDownloadDto,
   ) {
-    const file = await this.prisma.fileMetadata.findUniqueOrThrow({
+    const file = await this.prisma.fileMetadata.findUnique({
       where: { id },
     });
+
+    if (!file) {
+      throw new NotFoundException(`File metadata ${id} does not exist`);
+    }
+
     const downloadJob = await this.prisma.downloadJob.create({
       data: {
         fileMetadataId: file.id,

@@ -38,10 +38,13 @@ GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 GOOGLE_REDIRECT_URI=http://localhost:3000/api/google-drive/oauth/callback
 GOOGLE_DRIVE_WEBHOOK_URL=https://your-ngrok-domain.ngrok-free.app/api/webhooks/google-drive
+GOOGLE_DRIVE_ENABLE_WEBHOOKS=false
 TOKEN_ENCRYPTION_KEY=...
 ```
 
 `TOKEN_ENCRYPTION_KEY` must be 32 bytes as UTF-8, base64, or 64 hex chars.
+
+For local OAuth-only testing, keep `GOOGLE_DRIVE_ENABLE_WEBHOOKS=false`. The callback will connect Google Drive, store encrypted tokens, create a local watch source, and import an initial page of Drive file metadata without registering a Google webhook. Turn it on only when `GOOGLE_DRIVE_WEBHOOK_URL` is a public HTTPS URL that Google can reach.
 
 ## Google Cloud Setup
 
@@ -54,6 +57,8 @@ TOKEN_ENCRYPTION_KEY=...
 ```txt
 http://localhost:3000/api/google-drive/oauth/callback
 ```
+
+Google redirects to the API callback first because the backend must securely exchange the OAuth code for tokens. After a successful exchange, the API redirects the browser back to `APP_ORIGIN`, for example `http://localhost:4200/google-drive-sync`.
 
 6. Expose the API with ngrok:
 
@@ -116,6 +121,14 @@ pnpm docker:dev
 ```
 
 The dev Docker setup uses `docker-compose.dev.yml`. API and worker source code is bind-mounted into the containers, and each service runs through `pnpm nx serve ... --configuration=development` so Nx owns the project graph, compilation, and restart loop. After the first build, TypeScript changes under `apps/api`, `apps/worker`, and `libs` should recompile without rebuilding the Docker images.
+
+The Angular dev app is available at:
+
+```txt
+http://localhost:4200
+```
+
+The dev compose file also starts an optional local HTTPS reverse proxy at `https://localhost:4443`, but the default OAuth development flow uses `http://localhost:4200` for the UI and `http://localhost:3000` for the API callback.
 
 Use a rebuild only after dependency or Dockerfile changes:
 

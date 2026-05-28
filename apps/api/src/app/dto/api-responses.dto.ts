@@ -97,6 +97,43 @@ export class WatchSourceDto {
   status!: string;
 }
 
+export class GoogleDriveBrowserItemDto {
+  @ApiProperty({ example: '1m7Q7cUeV2...' })
+  id!: string;
+
+  @ApiProperty({ example: 'Invoices' })
+  name!: string;
+
+  @ApiProperty({ example: 'application/vnd.google-apps.folder' })
+  mimeType!: string;
+
+  @ApiProperty({ example: true })
+  isFolder!: boolean;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: 'https://drive.google.com/...',
+  })
+  webViewLink?: string | null;
+
+  @ApiPropertyOptional({ nullable: true, format: 'date-time' })
+  modifiedAt?: Date | null;
+}
+
+export class GoogleDriveBrowserResponseDto {
+  @ApiProperty({ example: '4f4193ea-39c1-4d8f-8dd1-55f6a70a4411' })
+  connectionId!: string;
+
+  @ApiProperty({ example: 'd2e50266-80db-44bf-aaf7-169d68fa2395' })
+  watchSourceId!: string;
+
+  @ApiPropertyOptional({ nullable: true, example: 'root' })
+  parentId?: string | null;
+
+  @ApiProperty({ type: GoogleDriveBrowserItemDto, isArray: true })
+  items!: GoogleDriveBrowserItemDto[];
+}
+
 export class SyncNowResponseDto {
   @ApiProperty({ example: true })
   queued!: boolean;

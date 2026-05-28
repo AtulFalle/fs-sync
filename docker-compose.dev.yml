@@ -1,9 +1,22 @@
 services:
+  https:
+    image: caddy:2-alpine
+    depends_on:
+      - api
+      - ui
+    ports:
+      - '4443:443'
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
   api:
     build:
       target: dev
     command: >
       sh -c "pnpm prisma generate &&
+      pnpm prisma migrate deploy &&
       pnpm nx reset &&
       pnpm nx serve api --configuration=development"
     environment:
@@ -55,6 +68,8 @@ services:
       - ui-dist:/app/dist
 
 volumes:
+  caddy-data:
+  caddy-config:
   api-node-modules:
   api-nx-cache:
   api-dist:
