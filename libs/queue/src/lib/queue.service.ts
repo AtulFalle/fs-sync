@@ -21,7 +21,7 @@ export class QueueService implements OnModuleDestroy {
       JOB_NAMES.googleDriveSync,
       { watchSourceId },
       {
-        jobId: `google-drive-sync:${watchSourceId}`,
+        jobId: `google-drive-sync-${watchSourceId}`,
         attempts: 6,
         backoff: { type: 'exponential', delay: 5_000 },
         removeOnComplete: 500,
@@ -37,7 +37,7 @@ export class QueueService implements OnModuleDestroy {
       JOB_NAMES.googleDriveSync,
       { watchSourceId },
       {
-        jobId: `google-drive-sync:${watchSourceId}:${Date.now()}`,
+        jobId: `google-drive-sync-${watchSourceId}-${Date.now()}`,
         attempts: 6,
         backoff: { type: 'exponential', delay: 5_000 },
         removeOnComplete: 500,
@@ -51,7 +51,7 @@ export class QueueService implements OnModuleDestroy {
       JOB_NAMES.downloadFile,
       { fileMetadataId },
       {
-        jobId: `download-file:${fileMetadataId}`,
+        jobId: `download-file-${fileMetadataId}`,
         attempts: 5,
         backoff: { type: 'exponential', delay: 10_000 },
         removeOnComplete: 500,

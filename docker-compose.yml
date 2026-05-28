@@ -30,6 +30,7 @@ services:
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
       GOOGLE_DRIVE_WEBHOOK_URL: ${GOOGLE_DRIVE_WEBHOOK_URL}
       TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY}
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:4200}
       PORT: 3000
     depends_on:
       - postgres

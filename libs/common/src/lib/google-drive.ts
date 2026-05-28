@@ -11,6 +11,9 @@ export const GOOGLE_DRIVE_OAUTH_SCOPES = [
 export const GOOGLE_DRIVE_CHANGE_FIELDS =
   'nextPageToken,newStartPageToken,changes(fileId,removed,file(id,name,mimeType,size,md5Checksum,parents,trashed,modifiedTime,webViewLink,version),time)';
 
+export const GOOGLE_DRIVE_FILE_FIELDS =
+  'nextPageToken,files(id,name,mimeType,size,md5Checksum,parents,trashed,modifiedTime,webViewLink,version)';
+
 export const GOOGLE_EXPORT_MIME_TYPES: Record<string, string> = {
   'application/vnd.google-apps.document': 'application/pdf',
   'application/vnd.google-apps.spreadsheet':

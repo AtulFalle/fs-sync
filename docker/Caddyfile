@@ -1,0 +1,16 @@
+{
+	local_certs
+}
+
+https://localhost {
+	tls internal
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy api:3000
+	}
+
+	handle {
+		reverse_proxy ui:4200
+	}
+}

@@ -3,6 +3,7 @@ import {
   decryptSecret,
   encryptSecret,
   GOOGLE_DRIVE_CHANGE_FIELDS,
+  GOOGLE_DRIVE_FILE_FIELDS,
   GOOGLE_DRIVE_FOLDER_MIME_TYPE,
   GOOGLE_DRIVE_OAUTH_SCOPES,
   GOOGLE_EXPORT_MIME_TYPES,
@@ -150,6 +151,41 @@ export class GoogleDriveProviderService {
       supportsAllDrives: true,
       pageSize: Number(optionalEnv('GOOGLE_DRIVE_CHANGES_PAGE_SIZE', '100')),
       fields: GOOGLE_DRIVE_CHANGE_FIELDS,
+    });
+    return response.data;
+  }
+
+  async listFiles(
+    connectionId: string,
+    pageToken?: string,
+  ): Promise<drive_v3.Schema$FileList> {
+    const drive = await this.getDriveClient(connectionId);
+    const response = await drive.files.list({
+      corpora: 'user',
+      includeItemsFromAllDrives: true,
+      pageSize: Number(optionalEnv('GOOGLE_DRIVE_INITIAL_FILES_PAGE_SIZE', '100')),
+      pageToken,
+      q: 'trashed = false',
+      supportsAllDrives: true,
+      fields: GOOGLE_DRIVE_FILE_FIELDS,
+    });
+    return response.data;
+  }
+
+  async listFolderChildren(
+    connectionId: string,
+    parentId = 'root',
+  ): Promise<drive_v3.Schema$FileList> {
+    const drive = await this.getDriveClient(connectionId);
+    const safeParentId = parentId.replace(/'/g, "\\'");
+    const response = await drive.files.list({
+      corpora: 'user',
+      includeItemsFromAllDrives: true,
+      orderBy: 'folder,name',
+      pageSize: Number(optionalEnv('GOOGLE_DRIVE_BROWSER_PAGE_SIZE', '100')),
+      q: `'${safeParentId}' in parents and trashed = false`,
+      supportsAllDrives: true,
+      fields: GOOGLE_DRIVE_FILE_FIELDS,
     });
     return response.data;
   }

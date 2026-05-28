@@ -1,0 +1,83 @@
+<section class="drive-browser">
+  <div class="drive-browser__header">
+    <div>
+      <h2 class="drive-browser__title">Google Drive folders</h2>
+      <div class="drive-browser__crumbs" aria-label="Folder path">
+        @for (folder of path(); track folder.id; let last = $last) {
+          <button
+            class="drive-browser__crumb"
+            type="button"
+            [disabled]="last"
+            (click)="goToFolder.emit(folder.id)"
+          >
+            {{ folder.name }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="drive-browser__empty">Loading Google Drive...</p>
+  } @else if (items().length === 0) {
+    <p class="drive-browser__empty">No folders or files in this location.</p>
+  } @else {
+    <div class="drive-browser__list">
+      @for (folder of folders(); track folder.id) {
+        <article
+          class="drive-browser__row"
+          [class.drive-browser__row--selected]="folder.id === selectedFolderId()"
+        >
+          <button
+            class="drive-browser__main"
+            type="button"
+            (click)="openFolder.emit(folder)"
+          >
+            <span class="drive-browser__icon" aria-hidden="true">Folder</span>
+            <span class="drive-browser__name">{{ folder.name }}</span>
+          </button>
+
+          <button
+            class="drive-browser__select"
+            type="button"
+            [disabled]="savingFolderId() === folder.id"
+            (click)="selectFolder.emit(folder)"
+          >
+            @if (savingFolderId() === folder.id) {
+              Saving...
+            } @else if (folder.id === selectedFolderId()) {
+              Selected
+            } @else {
+              Select folder
+            }
+          </button>
+        </article>
+      }
+
+      @for (file of files(); track file.id) {
+        <article class="drive-browser__row drive-browser__row--file">
+          <div class="drive-browser__main drive-browser__main--static">
+            <span class="drive-browser__icon" aria-hidden="true">File</span>
+            <span>
+              <span class="drive-browser__name">{{ file.name }}</span>
+              <span class="drive-browser__meta">
+                {{ fileKind(file) }} · {{ formatDate(file.modifiedAt) }}
+              </span>
+            </span>
+          </div>
+
+          @if (file.webViewLink) {
+            <a
+              class="drive-browser__select"
+              [href]="file.webViewLink"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open
+            </a>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>

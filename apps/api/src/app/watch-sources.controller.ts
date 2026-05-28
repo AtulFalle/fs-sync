@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -25,9 +33,12 @@ export class WatchSourcesController {
       'Returns local WatchSource records created during OAuth. Each source stores the current changes.list pageToken and webhook channel metadata.',
   })
   @ApiOkResponse({ type: WatchSourceDto, isArray: true })
-  list() {
+  list(@Query('orgId') orgId?: string) {
     return this.prisma.watchSource.findMany({
-      where: { provider: Provider.google_drive },
+      where: {
+        provider: Provider.google_drive,
+        connection: orgId ? { orgId } : undefined,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -45,6 +56,19 @@ export class WatchSourcesController {
   })
   @ApiOkResponse({ type: SyncNowResponseDto })
   async syncNow(@Param('id') id: string) {
+    if (!id) {
+      throw new BadRequestException('Missing watch source id');
+    }
+
+    const watchSource = await this.prisma.watchSource.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!watchSource) {
+      throw new NotFoundException(`Watch source ${id} does not exist`);
+    }
+
     await this.queues.enqueueGoogleDriveSync(id);
     return { queued: true, watchSourceId: id };
   }
